@@ -51,7 +51,8 @@ def scrape(path):
             # Drops headers off the end in case there were too many headers
             headers = headers[0:max([len(row) for row in table_data])]
 
-            table_dfs.extend([{"file":path,"table_number":str(t),"df":pd.DataFrame(table_data, columns=headers)}])
+            import os
+            table_dfs.extend([{"file":os.path.basename(path),"table_number":str(t),"df":pd.DataFrame(table_data, columns=headers)}])
     
     # Ensure we free up memory
     soup.decompose()
