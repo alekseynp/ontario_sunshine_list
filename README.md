@@ -10,22 +10,22 @@ The basic output from this toolchain is available for download in CSV format her
 
 **Process Your Own**
 
-1. Collect the raw HTML from http://www.fin.gov.on.ca/en/publications/salarydisclosure/
+Collect the raw HTML from http://www.fin.gov.on.ca/en/publications/salarydisclosure/  
 ```python
 from ontario_sunshine_list import collect  
 collect.collect('/home/aleksey/data/sunshine/')
 ```
-2. Scrape the data
+Scrape the data  
 ```python
 from ontario_sunshine_list import scrape
 df = scrape.scrape_one_big_df('/home/aleksey/data/sunshine/')
 ```
-3. Clean the data
+Clean the data  
 ```python
 from ontario_sunshine_list import clean
 df_clean = clean.clean(df)
 ```
-4. Save
+Save  
 ```python
 df_clean.to_csv('/home/aleksey/data.csv', encoding='utf-8')
 ```
