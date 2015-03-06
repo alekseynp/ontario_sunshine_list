@@ -15,6 +15,7 @@ def clean(df_dirty):
     
     import re
     df_clean['Employer'] = df_clean['Employer'].apply(lambda x: re.sub(' +',' ',unicode(x).strip().replace(u'\r',u'').replace(u'\n',u'').replace(u'\t',u'')))
+    df_clean['Position'] = df_clean['Position'].apply(lambda x: re.sub(' +',' ',unicode(x).strip().replace(u'\r',u'').replace(u'\n',u'').replace(u'\t',u'')))
     
     # $128,059,85
     df_clean.loc[df_clean['Salary'] == 12805985, 'Salary'] = 128059.85
