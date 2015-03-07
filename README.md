@@ -1,4 +1,4 @@
-# Ontario Sunshine List
+# Ontario Sunshine List Open Scraper
 
 This is a set of scripts and useful functions for anyone wanting to work with the Public Salary Disclosure data as published by the Ontario Ministry of Finance, also known as the Sunshine List.
 
@@ -14,6 +14,7 @@ The basic output from this toolchain is available for download in CSV format her
 import ontario_sunshine_list as osl
 ```
 Collect the raw HTML from http://www.fin.gov.on.ca/en/publications/salarydisclosure/  
+As of March 1, 2015 this is approx 500 mb of data.  
 ```python
 col = osl.Collector()
 col.run('/home/aleksey/data/sunshine/')
