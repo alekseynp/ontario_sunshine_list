@@ -10,22 +10,30 @@ The basic output from this toolchain is available for download in CSV format her
 
 **Process Your Own**
 
+```python
+import ontario_sunshine_list as osl
+```
 Collect the raw HTML from http://www.fin.gov.on.ca/en/publications/salarydisclosure/  
 ```python
-from ontario_sunshine_list import collect  
-collect.collect('/home/aleksey/data/sunshine/')
+col = osl.Collector()
+col.run('/home/aleksey/data/sunshine/')
 ```
 Scrape the data  
 ```python
-from ontario_sunshine_list import scrape
-df = scrape.scrape_one_big_df('/home/aleksey/data/sunshine/')
+scr = osl.Scraper()
+df = scr.run('/home/aleksey/data/sunshine/')
 ```
 Clean the data  
 ```python
-from ontario_sunshine_list import clean
-df_clean = clean.clean(df)
+cle = osl.Cleaner()
+df = cle.run(df)
 ```
 Save  
 ```python
-df_clean.to_csv('/home/aleksey/data.csv', encoding='utf-8')
+df.to_csv('/home/aleksey/data.csv', encoding='utf-8')
 ```
+
+# Outstanding Issues
+
+* Only the initial disclosure is scraped. Addenda are not scraped or processed.
+* 2015 disclosure has not yet been published or included
