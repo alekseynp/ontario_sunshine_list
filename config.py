@@ -148,6 +148,7 @@ category_translator = {
  'unive':'Universities',
  'ontpub':'Ontario Public Service',
  'ops':'Ontario Public Services',
+ 'seconded':'Ministries'
 }
 
 core_columns = [u'Employer', u'Surname', u'Given Name', u'Position', u'Salary', u'Benefits', u'Category']

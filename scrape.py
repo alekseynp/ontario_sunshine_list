@@ -7,6 +7,8 @@ import pandas as pd
 
 from config import *
 
+import openpyxl
+
 class Scraper:
     
     def __init__(self):
@@ -94,19 +96,9 @@ class Scraper:
         
         for f in onlyfiles:
             if ('year=' + str(year-1)) in f:
-                # Ontario Ministry of Finance website has duplicated links
-                # SAME DATA from
-                # - http://www.fin.gov.on.ca/en/publications/salarydisclosure/pssd/orgs.php?organization=ministries&year=2013
-                # - http://www.fin.gov.on.ca/en/publications/salarydisclosure/pssd/orgs.php?pageNum_pssd=0&totalRows_pssd=10483&organization=ministries&year=2013
-                # - http://www.fin.gov.on.ca/en/publications/salarydisclosure/pssd/orgs.php?pageNum_pssd=0&organization=ministries&year=2013
-                
-                # All organizations have links corresponding to the second type, even when there is only one page
-                # So we will filter for that
-                
-                if '&totalRows_pssd=' in f:   
-                    if verbose:
-                        print f
-                    results.extend(self.scrape(path + f))
+                if verbose:
+                    print f
+                results.extend(self.scrape(path + f))
             
         return results
     
@@ -169,9 +161,107 @@ class Scraper:
         df_core['Benefits'] = df_core['Benefits'].convert_objects(convert_numeric=True)
         return df_core
     
+    def read_2015_excel(self, local_save_dir_base):
+        wb = openpyxl.reader.excel.load_workbook(local_save_dir_base + 'pssd_compendium_2014.xlsx', read_only=True)
+        
+        # Salaries Sheet
+
+        ws = wb.get_sheet_by_name('Salaries')
+
+        category = []
+        for row in ws.iter_rows('B2:B111441'):
+            for cell in row:
+                category.extend([cell.value])
+
+        employer = []
+        for row in ws.iter_rows('C2:C111441'):
+            for cell in row:
+                employer.extend([cell.value])
+                
+        surname = []
+        for row in ws.iter_rows('D2:D111441'):
+            for cell in row:
+                surname.extend([cell.value])
+
+        given_name = []
+        for row in ws.iter_rows('E2:E111441'):
+            for cell in row:
+                given_name.extend([cell.value])
+                
+        position = []
+        for row in ws.iter_rows('F2:F111441'):
+            for cell in row:
+                position.extend([cell.value])
+
+        salary = []
+        for row in ws.iter_rows('G2:G111441'):
+            for cell in row:
+                salary.extend([cell.value])
+                
+        benefits = []
+        for row in ws.iter_rows('H2:H111441'):
+            for cell in row:
+                benefits.extend([cell.value])
+
+        df = pd.DataFrame({'Category':category, 'Employer':employer, 'Surname':surname, 'Given Name':given_name, 'Position':position, 'Salary':salary, 'Benefits':benefits})
+        df['year'] = 2015
+        df.loc[df['Category'].str.contains('Ministries'),'Category']='Ministries'
+        df.loc[df['Category'].str.contains('Colleges'),'Category']='Colleges'
+        df.loc[df['Category'].str.contains('Crown'),'Category']='Crown Agencies'
+        df.loc[df['Category'].str.contains('Hospitals'),'Category']='Hospitals and Boards of Public Health'
+        df.loc[df['Category'].str.contains('Hydro'),'Category']='Hydro One and Ontario Power Generation'
+        df.loc[df['Category'].str.contains('Judiciary'),'Category']='Judiciary'
+        df.loc[df['Category'].str.contains('Legislative'),'Category']='Legislative Assembly and Offices'
+        df.loc[df['Category'].str.contains('Municipalities'),'Category']='Municipalities and Services'
+        df.loc[df['Category'].str.contains('Public Sector'),'Category']='Other Public Sector Employers'
+        df.loc[df['Category'].str.contains('School'),'Category']='School Boards'
+        df.loc[df['Category'].str.contains('Universities'),'Category']='Universities'
+
+        # Seconded Sheet
+
+        ws = wb.get_sheet_by_name('Seconded Employees')
+
+        surname = []
+        for row in ws.iter_rows('B2:B146'):
+            for cell in row:
+                surname.extend([cell.value])
+
+        given_name = []
+        for row in ws.iter_rows('C2:C146'):
+            for cell in row:
+                given_name.extend([cell.value])
+
+        employer = []
+        for row in ws.iter_rows('E2:E146'):
+            for cell in row:
+                employer.extend([cell.value])
+
+        position = []
+        for row in ws.iter_rows('F2:F146'):
+            for cell in row:
+                position.extend([cell.value])
+
+        salary = []
+        for row in ws.iter_rows('G2:G146'):
+            for cell in row:
+                salary.extend([cell.value])
+                
+        benefits = []
+        for row in ws.iter_rows('H2:H146'):
+            for cell in row:
+                benefits.extend([cell.value])
+
+        df_seconded = pd.DataFrame({'Employer':employer, 'Surname':surname, 'Given Name':given_name, 'Position':position, 'Salary':salary, 'Benefits':benefits})
+        df_seconded['year'] = 2015
+        df_seconded['Category'] = 'Ministries'
+
+        return pd.concat([df, df_seconded])
+
+
     def run(self, local_save_dir_base):
         all_year_dfs=[]
     
+        # For years up to 2014 we will scrape the HTML
         for year in configuration.keys():
             print "Processing year " + str(year) + "..."
             df_year = self.do_year(year, configuration[year], local_save_dir_base)
@@ -180,5 +270,11 @@ class Scraper:
             df_year['year'] = year
             all_year_dfs.append(df_year)
             df_clean = pd.concat(all_year_dfs)
-            
+
+        # For 2015, we process the provided Excel file
+        print "Processing year 2015..."
+        df_2015 = self.read_2015_excel(local_save_dir_base)
+        print "Done."
+        df_clean = pd.concat([df_clean, df_2015])
+
         return df_clean

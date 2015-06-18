@@ -9,6 +9,17 @@ from bs4 import BeautifulSoup
 class Collector:
     def __init__(self):
         pass
+    
+    def download_2015_excel(self, local_save_dir_base):
+        uri = 'http://ontario.ca/sites/default/files/pssd_compendium_2014.xlsx'
+        response = urllib2.urlopen(uri)
+        excel_file = response.read()
+        save_file_path = local_save_dir_base + 'pssd_compendium_2014.xlsx'
+
+        print "Saving... " + uri + " to " + save_file_path
+
+        with open(save_file_path, 'w') as text_file:
+                text_file.write(excel_file)
 
     def get_relevant_links(self, html, sourceuri):
         relevant_links = []
@@ -27,12 +38,16 @@ class Collector:
         return relevant_links
     
     def run(self, local_save_dir_base):
+        self.download_2015_excel(local_save_dir_base)
+
         local_save_dir_base = local_save_dir_base + 'scrape/'
         
         scraped_links = []
         
         # Seed the scraper with a good set of what we really care about
-        unscraped_links = ['http://www.fin.gov.on.ca/en/publications/salarydisclosure/pssd/']
+        unscraped_links = ['http://www.fin.gov.on.ca/en/publications/salarydisclosure/pssd/',
+            'http://www.ontario.ca/government/public-sector-salary-disclosure/']
+
         for i in range(1997,2014):
             unscraped_links.extend(['http://www.fin.gov.on.ca/en/publications/salarydisclosure/' + str(i) + '/'])
     
@@ -88,3 +103,5 @@ class Collector:
                 if link not in scraped_links:
                     if link not in unscraped_links:
                         unscraped_links.extend([link])
+
+        
