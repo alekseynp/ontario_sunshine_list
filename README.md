@@ -6,7 +6,7 @@ This is a set of scripts and useful functions for anyone wanting to work with th
 
 **Download the Data**
 
-The basic output from this toolchain is available for download in CSV format here: (link missing)
+The basic output from this toolchain is available for download in CSV format here: https://s3-us-west-1.amazonaws.com/ontariosunshinelist/data_2015_06_17.csv
 
 **Process Your Own**
 
@@ -14,7 +14,7 @@ The basic output from this toolchain is available for download in CSV format her
 import ontario_sunshine_list as osl
 ```
 Collect the raw HTML from http://www.fin.gov.on.ca/en/publications/salarydisclosure/  
-As of March 1, 2015 this is approx 500 mb of data.  
+As of June 17, 2015 this is approx 500 mb of data.  
 ```python
 col = osl.Collector()
 col.run('/home/aleksey/data/sunshine/')
@@ -37,4 +37,4 @@ df.to_csv('/home/aleksey/data.csv', encoding='utf-8')
 # Outstanding Issues
 
 * Only the initial disclosure is scraped. Addenda are not scraped or processed.
-* 2015 disclosure has not yet been published or included
+* A couple of garbled datapoints in the HTML are not captured.
